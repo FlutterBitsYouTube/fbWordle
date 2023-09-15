@@ -22,6 +22,7 @@ class GameController extends StateNotifier<Game> {
           activeRow: 0,
           activeCol: 0,
           animateRow: -1,
+          submitAvailable: false,
         ));
 
   void initializeGame({required String newGameWord}) {
@@ -54,6 +55,7 @@ class GameController extends StateNotifier<Game> {
         activeRow: 1,
         activeCol: 0,
         animateRow: -1,
+        submitAvailable: false,
       );
 
       if (mounted) {
@@ -63,8 +65,10 @@ class GameController extends StateNotifier<Game> {
   }
 
   bool saveGuess() {
+    debugPrint('SaveGuess');
     Game game = state;
     Guess currentGuess = game.guesses[game.activeRow];
+
     final List<String> gameWord = game.gameWord.toList();
     int guessCount = game.guessCount;
     List<LetterStatus> letterMatch = [
@@ -75,15 +79,17 @@ class GameController extends StateNotifier<Game> {
       LetterStatus.unset,
     ];
 
-    for (Guess guess in game.guesses) {
+    for (int i = 0; i < game.guesses.length - 1; i++) {
       //If a repeat guess then invalid and have the user guess again.
-      if (guess.guessWord == currentGuess.guessWord) {
+      if (game.guesses[i].guessWord == currentGuess.guessWord) {
         return false;
       }
     }
     //Mark all correct answers
     for (int i = 0; i < 5; i++) {
+      debugPrint('gameWord[i]: ${gameWord[i]} currentGuess: ${currentGuess.guessWord[i]}');
       if (currentGuess.guessWord[i] == gameWord[i]) {
+        debugPrint('guess letter correct ${currentGuess.guessWord[i]}');
         letterMatch[i] = LetterStatus.correct;
         //Make sure this letter can not be matched again.
         gameWord[i] = '_';
@@ -116,9 +122,10 @@ class GameController extends StateNotifier<Game> {
         guesses: guesses,
         guessCount: guessCount + 1,
         gameStatus: game.gameStatus,
-        activeRow: game.activeRow + 1,
+        activeRow: game.activeRow,
         activeCol: 0,
         animateRow: game.activeRow,
+        submitAvailable: false,
       );
     }
 
@@ -147,6 +154,7 @@ class GameController extends StateNotifier<Game> {
     List<Guess> guesses = state.guesses.toList();
 
     guesses.add(guess);
+    debugPrint(('Guesses.length ${guesses.length}'));
 
     if (mounted) {
       state = Game(
@@ -154,9 +162,10 @@ class GameController extends StateNotifier<Game> {
         guesses: guesses,
         guessCount: state.guessCount,
         gameStatus: state.gameStatus,
-        activeRow: state.activeRow,
+        activeRow: state.activeRow + 1,
         activeCol: state.activeCol,
         animateRow: state.activeRow - 1,
+        submitAvailable: false,
       );
     }
   }
@@ -186,9 +195,17 @@ class GameController extends StateNotifier<Game> {
 
     if (letterColumn == game.activeCol) {
       //  debugPrint('No Guessing in Working Row Row-----');
-      return const GameSquareFocus();
+      return GameSquareFocus();
     }
-
+    if (letterColumn < game.activeCol) {
+      //debugPrint('ActiveRowWord: ${game.guesses[letterRow].guessWord}');
+      //debugPrint('activerow show saved letter--row$letterRow- col:$letterColumn--${game.guesses[letterRow].guessWord[letterColumn]}');
+      return GameSquare(
+        gameSquareValue: game.guesses[letterRow].guessWord[letterColumn],
+        letterStatus: LetterStatus.unset,
+      );
+    }
+    //debugPrint('AddingActiveRow GameSquare');
     return const GameSquare(
       gameSquareValue: '',
       letterStatus: LetterStatus.unset,
@@ -206,6 +223,7 @@ class GameController extends StateNotifier<Game> {
 
     //If already at last letter then can not change
     if (game.activeCol == 4 && currentGuess.length == 5) {
+      state = state;
       return;
     }
 
@@ -213,28 +231,32 @@ class GameController extends StateNotifier<Game> {
 
     List<Guess> guesses = game.guesses;
     Guess newGuess = guesses.last;
-    //newGuess.guessWord.removeLast();
+    bool submitAvailable = false;
+
     newGuess.guessWord.add(letter);
-    String guessWordPrint = '';
-    for (String letter in newGuess.guessWord) {
-      guessWordPrint = guessWordPrint + letter;
-    }
-    debugPrint(guessWordPrint);
+
     guesses.removeLast();
     guesses.add(newGuess);
 
+    if (activeCol == 4) {
+      submitAvailable = true;
+    }
     if (activeCol < 4) {
       activeCol = activeCol + 1;
     }
+    debugPrint('saving letter :$letter');
 
-    state = Game(
-      gameWord: game.gameWord,
-      guesses: guesses,
-      guessCount: game.guessCount,
-      gameStatus: game.gameStatus,
-      activeRow: game.activeRow,
-      activeCol: activeCol,
-      animateRow: game.animateRow,
-    );
+    if (mounted) {
+      state = Game(
+        gameWord: game.gameWord,
+        guesses: guesses,
+        guessCount: game.guessCount,
+        gameStatus: game.gameStatus,
+        activeRow: game.activeRow,
+        activeCol: activeCol,
+        animateRow: game.animateRow,
+        submitAvailable: submitAvailable,
+      );
+    }
   }
 }

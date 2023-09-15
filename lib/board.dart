@@ -10,11 +10,12 @@ class Board extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final size = MediaQuery.of(context).size;
     Game game = ref.watch(gameController);
 
     List<Widget> generateBoard() {
       List<Widget> gameRowBuilder = [];
-      for (int i = 0; i < 6; i++) {
+      for (int i = 0; i < 5; i++) {
         //TODO add gameRow Animated Builder
         if (i == game.animateRow) {
           gameRowBuilder.add(const GameRowAnimated());
@@ -26,18 +27,33 @@ class Board extends ConsumerWidget {
       return gameRowBuilder;
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(
-          height: 200,
-        ),
-        Center(
+    return Material(
+      child: Scaffold(
+        body: Container(
+          constraints: BoxConstraints(
+            maxWidth: double.infinity,
+            maxHeight: size.height - 182,
+          ),
           child: Column(
-            children: generateBoard(),
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: generateBoard(),
+              ),
+              game.submitAvailable
+                  ? TextButton(
+                      onPressed: () {
+                        ref.read(gameController.notifier).saveGuess();
+                      },
+                      child: const Text('Submit'))
+                  : const Text(
+                      'not avaialbe',
+                    ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

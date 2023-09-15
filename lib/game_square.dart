@@ -9,15 +9,19 @@ class GameSquare extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(color: letterStatus.squareColor, border: Border.all(color: Colors.white)),
-        width: 40,
-        height: 40,
-        child: Text(
-          gameSquareValue,
-          style: const TextStyle(color: Colors.white),
+    return Material(
+      child: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Container(
+          decoration: BoxDecoration(color: letterStatus.squareColor, border: Border.all(color: Colors.white)),
+          width: 60,
+          height: 60,
+          child: Center(
+            child: Text(
+              gameSquareValue,
+              style: const TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
         ),
       ),
     );

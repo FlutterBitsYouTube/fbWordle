@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -39,13 +41,7 @@ class Guess {
   Guess({required this.guessWord, required this.letterMatch});
 
   factory Guess.empty() => Guess(
-        guessWord: [
-          '',
-          '',
-          '',
-          '',
-          '',
-        ],
+        guessWord: [],
         letterMatch: [
           LetterStatus.unset,
           LetterStatus.unset,
@@ -54,6 +50,10 @@ class Guess {
           LetterStatus.unset,
         ],
       );
+
+  printGuess() {
+    debugPrint(guessWord.toString());
+  }
 }
 
 @freezed
@@ -65,6 +65,7 @@ class Game {
   int activeRow;
   int activeCol;
   int animateRow;
+  bool submitAvailable;
 
   Game({
     required this.gameWord,
@@ -74,5 +75,6 @@ class Game {
     required this.activeRow,
     required this.activeCol,
     required this.animateRow,
+    required this.submitAvailable,
   });
 }

@@ -29,7 +29,8 @@ class GameRowAnimated extends ConsumerWidget {
     return Center(
       child: SizedBox(
         width: 500,
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: animatedRow,
         ),
       ),
