@@ -17,7 +17,7 @@ class GameRow extends ConsumerWidget {
       List<Widget> gameRow = [];
 
       for (int i = 0; i < 5; i++) {
-        gameRow.add(ref.read(gameController.notifier).setLetterWidget(letterRow: guessNumber, letterColumn: i));
+        gameRow.add(ref.read(gameController.notifier).setLetterWidget(letterRowIndex: guessNumber, letterColumnIndex: i));
       }
 
       return gameRow;

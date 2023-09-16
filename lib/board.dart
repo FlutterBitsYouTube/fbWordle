@@ -17,7 +17,7 @@ class Board extends ConsumerWidget {
       List<Widget> gameRowBuilder = [];
       for (int i = 0; i < 5; i++) {
         //TODO add gameRow Animated Builder
-        if (i == game.animateRow) {
+        if (i == game.animateRowIndex) {
           gameRowBuilder.add(const GameRowAnimated());
         } else {
           gameRowBuilder.add(GameRow(guessNumber: i));

@@ -62,9 +62,9 @@ class Game {
   List<Guess> guesses;
   int guessCount;
   GameStatus gameStatus;
-  int activeRow;
-  int activeCol;
-  int animateRow;
+  int activeRowIndex;
+  int activeColIndex;
+  int animateRowIndex;
   bool submitAvailable;
 
   Game({
@@ -72,9 +72,9 @@ class Game {
     required this.guesses,
     required this.guessCount,
     required this.gameStatus,
-    required this.activeRow,
-    required this.activeCol,
-    required this.animateRow,
+    required this.activeRowIndex,
+    required this.activeColIndex,
+    required this.animateRowIndex,
     required this.submitAvailable,
   });
 }

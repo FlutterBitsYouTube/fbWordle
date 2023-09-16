@@ -19,8 +19,8 @@ class GameRowAnimated extends ConsumerWidget {
       animatedRow.add(
         FlipCard(
           autoFlipDuration: Duration(milliseconds: delay),
-          front: GameSquare(gameSquareValue: game.guesses[game.animateRow].guessWord[i], letterStatus: game.guesses[game.animateRow].letterMatch[i]),
-          back: GameSquare(gameSquareValue: game.guesses[game.animateRow].guessWord[i], letterStatus: game.guesses[game.animateRow].letterMatch[i]),
+          front: GameSquare(gameSquareValue: game.guesses[game.animateRowIndex].guessWord[i], letterStatus: game.guesses[game.animateRowIndex].letterMatch[i]),
+          back: GameSquare(gameSquareValue: game.guesses[game.animateRowIndex].guessWord[i], letterStatus: game.guesses[game.animateRowIndex].letterMatch[i]),
         ),
       );
       delay = delay + 500;

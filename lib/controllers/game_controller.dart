@@ -19,9 +19,9 @@ class GameController extends StateNotifier<Game> {
           guesses: [],
           guessCount: 0,
           gameStatus: GameStatus.unfinished,
-          activeRow: 0,
-          activeCol: 0,
-          animateRow: -1,
+          activeRowIndex: 0,
+          activeColIndex: 0,
+          animateRowIndex: -1,
           submitAvailable: false,
         ));
 
@@ -52,9 +52,9 @@ class GameController extends StateNotifier<Game> {
         guesses: guesses,
         guessCount: 1,
         gameStatus: GameStatus.unfinished,
-        activeRow: 1,
-        activeCol: 0,
-        animateRow: -1,
+        activeRowIndex: 1,
+        activeColIndex: 0,
+        animateRowIndex: -1,
         submitAvailable: false,
       );
 
@@ -67,7 +67,7 @@ class GameController extends StateNotifier<Game> {
   bool saveGuess() {
     debugPrint('SaveGuess');
     Game game = state;
-    Guess currentGuess = game.guesses[game.activeRow];
+    Guess currentGuess = game.guesses[game.activeRowIndex];
 
     final List<String> gameWord = game.gameWord.toList();
     int guessCount = game.guessCount;
@@ -122,9 +122,9 @@ class GameController extends StateNotifier<Game> {
         guesses: guesses,
         guessCount: guessCount + 1,
         gameStatus: game.gameStatus,
-        activeRow: game.activeRow,
-        activeCol: 0,
-        animateRow: game.activeRow,
+        activeRowIndex: game.activeRowIndex,
+        activeColIndex: game.activeColIndex,
+        animateRowIndex: game.activeRowIndex,
         submitAvailable: false,
       );
     }
@@ -162,27 +162,27 @@ class GameController extends StateNotifier<Game> {
         guesses: guesses,
         guessCount: state.guessCount,
         gameStatus: state.gameStatus,
-        activeRow: state.activeRow + 1,
-        activeCol: state.activeCol,
-        animateRow: state.activeRow - 1,
+        activeRowIndex: state.activeRowIndex + 1,
+        activeColIndex: 0,
+        animateRowIndex: state.activeRowIndex,
         submitAvailable: false,
       );
     }
   }
 
-  Widget setLetterWidget({required int letterRow, required int letterColumn}) {
+  Widget setLetterWidget({required int letterRowIndex, required int letterColumnIndex}) {
     Game game = state;
-
+    //debugPrint('Drawing: RowIndex $letterRowIndex - ColIndex $letterColumnIndex');
     //debugPrint('GameCount: ${game.guessCount} - letterRow: $letterRow');
 
-    if (letterRow < game.activeRow) {
+    if (letterRowIndex < game.activeRowIndex) {
       return GameSquare(
-        gameSquareValue: game.guesses[letterRow].guessWord[letterColumn],
-        letterStatus: game.guesses[letterRow].letterMatch[letterColumn],
+        gameSquareValue: game.guesses[letterRowIndex].guessWord[letterColumnIndex],
+        letterStatus: game.guesses[letterRowIndex].letterMatch[letterColumnIndex],
       );
     }
 
-    if (letterRow > game.activeRow) {
+    if (letterRowIndex > game.activeRowIndex) {
       return const GameSquare(
         gameSquareValue: '',
         letterStatus: LetterStatus.unset,
@@ -192,16 +192,19 @@ class GameController extends StateNotifier<Game> {
     // debugPrint('GameCount: ${game.guessCount}, GuesseLength:${game.guesses.length} - letterRow: $letterRow');
 
     //Working Row -
-
-    if (letterColumn == game.activeCol) {
-      //  debugPrint('No Guessing in Working Row Row-----');
-      return GameSquareFocus();
+    if (game.activeColIndex == 5 && letterColumnIndex == 4) {
+      debugPrint('Focus RowIndex $letterRowIndex - ColIndex $letterColumnIndex');
+      return const GameSquareFocus();
     }
-    if (letterColumn < game.activeCol) {
+    if (letterColumnIndex == game.activeColIndex) {
+      debugPrint('Focus RowIndex $letterRowIndex - ColIndex $letterColumnIndex');
+      return const GameSquareFocus();
+    }
+    if (letterColumnIndex < game.activeColIndex) {
       //debugPrint('ActiveRowWord: ${game.guesses[letterRow].guessWord}');
       //debugPrint('activerow show saved letter--row$letterRow- col:$letterColumn--${game.guesses[letterRow].guessWord[letterColumn]}');
       return GameSquare(
-        gameSquareValue: game.guesses[letterRow].guessWord[letterColumn],
+        gameSquareValue: game.guesses[letterRowIndex].guessWord[letterColumnIndex],
         letterStatus: LetterStatus.unset,
       );
     }
@@ -212,17 +215,17 @@ class GameController extends StateNotifier<Game> {
     );
   }
 
-  void saveLetter({required String letter}) {
+  void addLetter({required String letter}) {
     Game game = state;
-    int activeCol = game.activeCol;
+    int activeColIndex = game.activeColIndex;
     //If this is the start of a new
-    List<String> currentGuess = game.guesses[game.activeRow].guessWord.toList();
+    List<String> currentGuess = game.guesses[game.activeRowIndex].guessWord.toList();
     // for (String letter in currentGuess) {
     //   debugPrint(letter);
     // }
 
     //If already at last letter then can not change
-    if (game.activeCol == 4 && currentGuess.length == 5) {
+    if (activeColIndex == 5 && currentGuess.length == 5) {
       state = state;
       return;
     }
@@ -234,17 +237,70 @@ class GameController extends StateNotifier<Game> {
     bool submitAvailable = false;
 
     newGuess.guessWord.add(letter);
+    debugPrint('saving letter :$letter ${newGuess.guessWord.toString()} activeCol:$activeColIndex');
 
-    guesses.removeLast();
-    guesses.add(newGuess);
+    saveUpdatedGuess(guess: newGuess);
 
-    if (activeCol == 4) {
+    if (activeColIndex == 5) {
       submitAvailable = true;
     }
-    if (activeCol < 4) {
-      activeCol = activeCol + 1;
+    if (activeColIndex < 5) {
+      activeColIndex = activeColIndex + 1;
     }
-    debugPrint('saving letter :$letter');
+
+    if (mounted) {
+      state = Game(
+        gameWord: game.gameWord,
+        guesses: game.guesses,
+        guessCount: game.guessCount,
+        gameStatus: game.gameStatus,
+        activeRowIndex: game.activeRowIndex,
+        activeColIndex: activeColIndex,
+        animateRowIndex: game.animateRowIndex,
+        submitAvailable: submitAvailable,
+      );
+    }
+
+    debugPrint('save complete ${newGuess.guessWord.toString()} activeCol:$activeColIndex');
+  }
+
+  void removeLetter() {
+    debugPrint('deletetriggered');
+    Game game = state;
+    int activeColIndex = game.activeColIndex;
+    bool submitAvailable = false;
+
+    Guess guess = game.guesses.last;
+    debugPrint('deleteing letter in ${guess.guessWord.toString()} activeColIndex:$activeColIndex');
+
+    guess.guessWord.removeLast();
+
+    saveUpdatedGuess(guess: guess);
+
+    activeColIndex = activeColIndex - 1;
+
+    if (mounted) {
+      state = Game(
+        gameWord: game.gameWord,
+        guesses: game.guesses,
+        guessCount: game.guessCount,
+        gameStatus: game.gameStatus,
+        activeRowIndex: game.activeRowIndex,
+        activeColIndex: activeColIndex,
+        animateRowIndex: game.animateRowIndex,
+        submitAvailable: submitAvailable,
+      );
+    }
+
+    debugPrint('deleteing done now ${guess.guessWord.toString()} activeColIndex:$activeColIndex');
+  }
+
+  void saveUpdatedGuess({required Guess guess}) {
+    Game game = state;
+    List<Guess> guesses = game.guesses;
+
+    guesses.removeLast();
+    guesses.add(guess);
 
     if (mounted) {
       state = Game(
@@ -252,10 +308,10 @@ class GameController extends StateNotifier<Game> {
         guesses: guesses,
         guessCount: game.guessCount,
         gameStatus: game.gameStatus,
-        activeRow: game.activeRow,
-        activeCol: activeCol,
-        animateRow: game.animateRow,
-        submitAvailable: submitAvailable,
+        activeRowIndex: game.activeRowIndex,
+        activeColIndex: game.activeColIndex,
+        animateRowIndex: game.animateRowIndex,
+        submitAvailable: game.submitAvailable,
       );
     }
   }

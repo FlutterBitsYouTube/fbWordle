@@ -10,11 +10,14 @@ class GameSquareFocus extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    debugPrint('drawfocus');
     Game game = ref.watch(gameController);
+    TextEditingController textController = TextEditingController(text: '');
 
     bool textFieldEnabled = true;
     if (game.guesses.last.guessWord.length == 5) {
       textFieldEnabled = false;
+      textController.text = game.guesses.last.guessWord.last;
     }
 
     return Padding(
@@ -27,6 +30,7 @@ class GameSquareFocus extends ConsumerWidget {
           child: RawKeyboardListener(
             focusNode: FocusNode(
               onKeyEvent: (node, event) {
+                debugPrint('pressing');
                 if (!textFieldEnabled) {
                   return KeyEventResult.handled;
                 }
@@ -37,10 +41,12 @@ class GameSquareFocus extends ConsumerWidget {
               debugPrint(event.logicalKey.keyLabel);
 
               if (event.runtimeType.toString() == 'RawKeyDownEvent' && event.logicalKey == LogicalKeyboardKey.backspace) {
+                ref.read(gameController.notifier).removeLetter();
                 debugPrint('delete');
               }
             },
             child: TextField(
+              controller: textController,
               textAlign: TextAlign.center,
               cursorColor: Colors.transparent,
               decoration: const InputDecoration(
@@ -58,7 +64,7 @@ class GameSquareFocus extends ConsumerWidget {
                 if (value.length == 1) {
                   String upperCase = value.toUpperCase();
                   debugPrint('save letter');
-                  ref.read(gameController.notifier).saveLetter(letter: upperCase);
+                  ref.read(gameController.notifier).addLetter(letter: upperCase);
                 }
               },
               style: const TextStyle(
