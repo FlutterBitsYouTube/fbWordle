@@ -44,11 +44,11 @@ class Board extends ConsumerWidget {
               game.submitAvailable
                   ? TextButton(
                       onPressed: () {
-                        ref.read(gameController.notifier).saveGuess();
+                        ref.read(gameController.notifier).submitGuess();
                       },
                       child: const Text('Submit'))
                   : const Text(
-                      'not avaialbe',
+                      'not available',
                     ),
             ],
           ),

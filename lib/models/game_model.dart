@@ -60,20 +60,14 @@ class Guess {
 class Game {
   List<String> gameWord;
   List<Guess> guesses;
-  int guessCount;
   GameStatus gameStatus;
-  int activeRowIndex;
-  int activeColIndex;
   int animateRowIndex;
   bool submitAvailable;
 
   Game({
     required this.gameWord,
     required this.guesses,
-    required this.guessCount,
     required this.gameStatus,
-    required this.activeRowIndex,
-    required this.activeColIndex,
     required this.animateRowIndex,
     required this.submitAvailable,
   });

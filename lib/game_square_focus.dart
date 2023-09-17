@@ -15,10 +15,13 @@ class GameSquareFocus extends ConsumerWidget {
     TextEditingController textController = TextEditingController(text: '');
 
     bool textFieldEnabled = true;
+    //if (game.guesses.isNotEmpty) {
+    //debugPrint('drawfocus-game.guesses.length:${game.guesses.length}');
     if (game.guesses.last.guessWord.length == 5) {
       textFieldEnabled = false;
       textController.text = game.guesses.last.guessWord.last;
     }
+    //}
 
     return Padding(
       padding: const EdgeInsets.all(2.0),
@@ -30,7 +33,7 @@ class GameSquareFocus extends ConsumerWidget {
           child: RawKeyboardListener(
             focusNode: FocusNode(
               onKeyEvent: (node, event) {
-                debugPrint('pressing');
+                //debugPrint('pressing');
                 if (!textFieldEnabled) {
                   return KeyEventResult.handled;
                 }
@@ -42,7 +45,7 @@ class GameSquareFocus extends ConsumerWidget {
 
               if (event.runtimeType.toString() == 'RawKeyDownEvent' && event.logicalKey == LogicalKeyboardKey.backspace) {
                 ref.read(gameController.notifier).removeLetter();
-                debugPrint('delete');
+                //debugPrint('delete');
               }
             },
             child: TextField(

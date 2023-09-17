@@ -13,7 +13,7 @@ class GameRow extends ConsumerWidget {
     Game game = ref.watch(gameController);
 
     List<Widget> generateGuessRow() {
-      debugPrint('generateGuessRow executing');
+      //debugPrint('generateGuessRow executing');
       List<Widget> gameRow = [];
 
       for (int i = 0; i < 5; i++) {
